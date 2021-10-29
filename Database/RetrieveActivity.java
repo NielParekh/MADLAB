@@ -1,46 +1,77 @@
-package com.example.databaseapplication;
+package com.example.dbms;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import android.widget.Toast;
 
 public class RetrieveActivity extends AppCompatActivity {
-    Button b;
-    EditText e;
-    TextView t;
-    String id;
-    SQLiteDatabase db;
-    Cursor rs;
+
+    EditText code;
+    TextView name, gender, dept, salary;
+    Button search;
+    private DBHelper dbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_retrieve);
-        db = openOrCreateDatabase("db", MODE_PRIVATE, null);
-        b = findViewById(R.id.buttonr);
-        e = findViewById(R.id.editTextr);
-        t = findViewById(R.id.resultr);
-        b.setOnClickListener(new View.OnClickListener() {
+
+        Intent intent = getIntent();
+
+        code = findViewById(R.id.empcode_upd);
+        search = findViewById(R.id.button_search);
+
+        name = findViewById(R.id.empname_display);
+        gender = findViewById(R.id.gender_display);
+        dept = findViewById(R.id.dept_display);
+        salary = findViewById(R.id.salary_display);
+
+        search.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                id = e.getText().toString();
-                rs = db.rawQuery("SELECT * FROM EMPLOYEES WHERE ID = ?;", new String[]{id});
-                rs.moveToFirst();
-                try {
-                    t.setText(rs.getString(0) + " " + rs.getString(1) + " " + rs.getString(2) + " " + rs.getString(3) + " " + rs.getString(4));
-                } catch (Exception ex) {
-                    t.setText("No such employee");
-                    ex.printStackTrace();
+            public void onClick(View v) {
+                String empcode = code.getText().toString();
+
+                if (empcode.length() == 0) {
+                    code.requestFocus();
+                    code.setError("FIELD CANNOT BE EMPTY");
+                } else if (!empcode.matches("[a-zA-Z0-9 ]+")) {
+                    code.requestFocus();
+                    code.setError("ENTER ONLY ALPHANUMERICAL CHARACTER");
+                }
+
+                dbHelper = new DBHelper(RetrieveActivity.this);
+
+                String[] vals = dbHelper.retrieveEmployee(empcode);
+//                Cursor c = dbHelper.retrieveEmployee(empcode);
+//                if(c.moveToNext()){
+//                    name.setText(c.getString(0));
+//                }
+                if(vals == null) {
+                    Toast.makeText(RetrieveActivity.this, "Nothing returned", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                else {
+                    String empname = vals[0];
+                    String sex = vals[1];
+                    String department = vals[2];
+                    String sal = vals[3];
+
+                    name.setText(empname);
+                    gender.setText(sex);
+                    dept.setText(department);
+                    salary.setText(sal);
+
+                    code.setText("");
                 }
             }
         });
+
     }
 }

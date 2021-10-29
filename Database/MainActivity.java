@@ -1,72 +1,83 @@
-package com.example.databaseapplication;
+package com.example.dbms;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
-
-import java.io.Serializable;
 
 public class MainActivity extends AppCompatActivity {
-    Button b1, b2, b3, b4, b5, b6;
-    SQLiteDatabase db;
+
+    private DBHelper dbHandler;
+    private Button btn_create, btn_insert, btn_update, btn_delete, btn_retrieve;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        b1 = findViewById(R.id.button1);
-        b2 = findViewById(R.id.button2);
-        b3 = findViewById(R.id.button3);
-        b4 = findViewById(R.id.button4);
-        b5 = findViewById(R.id.button5);
-        b6 = findViewById(R.id.button6);
-        db = openOrCreateDatabase("db", MODE_PRIVATE, null);
-        b1.setOnClickListener(new View.OnClickListener() {
+
+        btn_create = findViewById(R.id.btn_create);
+        btn_insert = findViewById(R.id.btn_insert);
+        btn_update = findViewById(R.id.btn_update);
+        btn_delete = findViewById(R.id.btn_delete);
+        btn_retrieve = findViewById(R.id.btn_retrieve);
+
+        btn_create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db.execSQL("DROP TABLE IF EXISTS EMPLOYEES;");
-                db.execSQL("CREATE TABLE EMPLOYEES(NAME VARCHAR(20), GENDER VARCHAR(20), ID VARCHAR(20), DEPT VARCHAR(20), SALARY VARCHAR(20));");
-                Toast.makeText(getApplicationContext(), "Created!", Toast.LENGTH_SHORT).show();
+                dbHandler = new DBHelper(MainActivity.this);
+
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+                builder1.setMessage("Table Employees created successfully!!");
+                builder1.setCancelable(true);
+
+                builder1.setPositiveButton(
+                        "GG",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
             }
         });
-        b2.setOnClickListener(new View.OnClickListener() {
+
+        btn_insert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent myIntent = new Intent(getApplicationContext(), InsertActivity.class);
-                MainActivity.this.startActivity(myIntent);
+                Intent intent = new Intent(MainActivity.this, InsertActivity.class);
+                startActivity(intent);
             }
         });
-        b3.setOnClickListener(new View.OnClickListener() {
+
+        btn_update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent myIntent = new Intent(getApplicationContext(), UpdateActivity.class);
-                MainActivity.this.startActivity(myIntent);
+                Intent intent = new Intent(MainActivity.this, UpdateActivity.class);
+                startActivity(intent);
             }
         });
-        b4.setOnClickListener(new View.OnClickListener() {
+
+        btn_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent myIntent = new Intent(getApplicationContext(), DeleteActivity.class);
-                MainActivity.this.startActivity(myIntent);
+                Intent intent = new Intent(MainActivity.this, DeleteActivity.class);
+                startActivity(intent);
             }
         });
-        b5.setOnClickListener(new View.OnClickListener() {
+
+        btn_retrieve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent myIntent = new Intent(getApplicationContext(), RetrieveActivity.class);
-                MainActivity.this.startActivity(myIntent);
+                Intent intent = new Intent(MainActivity.this, RetrieveActivity.class);
+                startActivity(intent);
             }
         });
-        b6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent myIntent = new Intent(getApplicationContext(), RetrieveDeptActivity.class);
-                MainActivity.this.startActivity(myIntent);
-            }
-        });
+
     }
 }
